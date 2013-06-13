@@ -8,9 +8,9 @@ using dict = System.Collections.Generic.Dictionary<string, string>;
 
 namespace Plivo.Util
 {
-    class XPlivoSignature
+    public class XPlivoSignature
     {
-        static bool Verify(string uri, dict plivoHttpParams, string xPlivoSignature, string authToken)
+        public static bool Verify(string uri, dict plivoHttpParams, string xPlivoSignature, string authToken)
         {
             var isMatch = false;
             foreach (KeyValuePair<string, string> kvp in plivoHttpParams.OrderBy(key => key.Key))
@@ -29,7 +29,7 @@ namespace Plivo.Util
         }
     }
 
-    class HtmlEntity {
+    public class HtmlEntity {
         public static string Convert(string inputText) {
             StringBuilder builder = new StringBuilder();
             foreach (char c in inputText)
