@@ -27,12 +27,10 @@ namespace Plivo.API
         public string city { get; set; }
         public string name { get; set; }
         public string cash_credits { get; set; }
-        public string created { get; set; }
-        public string enabled { get; set; }
-        public string modified { get; set; }
+        public string billing_mode { get; set; }
+        public bool auto_recharge { get; set; }
         public string error { get; set; }
         public string api_id { get; set; }
-        public string postpaid { get; set; }
         public string state { get; set; }
         public string address { get; set; }
         public string timezone { get; set; }
@@ -42,15 +40,16 @@ namespace Plivo.API
 
     public class ResourceListMeta
     {
-        public object previous { get; set; }
+        public string previous { get; set; }
         public int total_count { get; set; }
         public int offset { get; set; }
         public int limit { get; set; }
         public string next { get; set; }
     }
+
     public class SubAccountMeta
     {
-        public object previous { get; set; }
+        public string previous { get; set; }
         public int total_count { get; set; }
         public int offset { get; set; }
         public int limit { get; set; }
@@ -65,7 +64,17 @@ namespace Plivo.API
         public bool enabled { get; set; }
         public string modified { get; set; }
         public string auth_id { get; set; }
+        public string auth_token { get; set; }
         public string resource_uri { get; set; }
+        public string error { get; set; }
+        public string api_id { get; set; }
+    }
+
+    public class CreateSubAccount
+    {
+        public string auth_id { get; set; }
+        public string auth_token { get; set; }
+        public string message { get; set; }
         public string error { get; set; }
         public string api_id { get; set; }
     }
@@ -88,6 +97,14 @@ namespace Plivo.API
         public string next { get; set; }
     }
 
+    public class CreateApplication
+    {
+        public string app_id { get; set; }
+        public string api_id { get; set; }
+        public string message { get; set; }
+        public string error { get; set; }
+    }
+
     public class Application
     {
         public string fallback_method { get; set; }
@@ -107,6 +124,8 @@ namespace Plivo.API
         public string message_method { get; set; }
         public string fallback_answer_url { get; set; }
         public string answer_method { get; set; }
+        public string api_id { get; set; }
+        public string error { get; set; }
     }
 
     public class ApplicationList
@@ -130,6 +149,7 @@ namespace Plivo.API
     public class Number
     {
         public string region { get; set; }
+        public string carrier { get; set; }
         public bool voice_enabled { get; set; }
         public bool sms_enabled { get; set; }
         public bool fax_enabled { get; set; }
@@ -144,15 +164,14 @@ namespace Plivo.API
         public string resource_uri { get; set; }
         public string group_id { get; set; }
         public string prefix { get; set; }
-        public string rental_rate { get; set; }
         public string setup_rate { get; set; }
         public int stock { get; set; }
         [ObsoleteAttribute]
         public string country { get; set; }
         [ObsoleteAttribute]
         public int lata { get; set; }
-        [ObsoleteAttribute("Use the attribute rental_rate instead")]
         public string monthly_rental_rate { get; set; }
+        public string error { get; set; }
     }
 
     public class NumberList
@@ -173,6 +192,9 @@ namespace Plivo.API
     {
         public List<NumberStatus> numbers { get; set; }
         public string status { get; set; }
+        public string api_id { get; set; }
+        public string message { get; set; }
+        public string error { get; set; }
     }
 
     // Call Models
@@ -180,6 +202,14 @@ namespace Plivo.API
     {
         public string message { get; set; }
         public string request_uuid { get; set; }
+        public string api_id { get; set; }
+        public string error { get; set; }
+    }
+
+    public class BulkCall
+    {
+        public string message { get; set; }
+        public List<string> request_uuids { get; set; }
         public string api_id { get; set; }
         public string error { get; set; }
     }
@@ -216,6 +246,8 @@ namespace Plivo.API
     public class CDR
     {
         public int bill_duration { get; set; }
+        public int billed_duration { get; set; }
+        public int call_duration { get; set; }
         public string total_amount { get; set; }
         public string parent_call_uuid { get; set; }
         public string call_direction { get; set; }
@@ -290,6 +322,15 @@ namespace Plivo.API
         public string error { get; set; }
     }
 
+    public class CreateEndpoint
+    {
+        public string username { get; set; }
+        public string endpoint_id { get; set; }
+        public string alias { get; set; }
+        public string message { get; set; }
+        public string api_id { get; set; }
+        public string error { get; set; }
+    }
     public class EndpointList
     {
         public EndpointMeta meta { get; set; }
@@ -318,23 +359,25 @@ namespace Plivo.API
 
     public class Message
     {
-        public string cloud_rate { get; set; }
-        public string carrier_rate { get; set; }
+        public string total_rate { get; set; }
+        public string total_amount { get; set; }
         public string message_direction { get; set; }
         public string to_number { get; set; }
         public string message_state { get; set; }
-        public string total_amount { get; set; }
         public string from_number { get; set; }
         public string message_uuid { get; set; }
         public string message_time { get; set; }
         public string resource_uri { get; set; }
         public string message_type { get; set; }
+        public string api_id { get; set; }
+        public string error { get; set; }
     }
 
     public class MessageList
     {
         public MessageMeta meta { get; set; }
         public string api_id { get; set; }
+        public string error { get; set; }
         public List<Message> objects { get; set; }
     }
     
@@ -356,6 +399,8 @@ namespace Plivo.API
         public string resource_uri { get; set; }
         public string sms { get; set; }
         public string voice { get; set; }
+        public string api_id { get; set; }
+        public string error { get; set; }
     }
     
     public class IncomingCarrierList
@@ -385,6 +430,8 @@ namespace Plivo.API
         public string enabled { get; set; }
         public string retries { get; set; }
         public string resource_uri { get; set; }
+        public string error { get; set; }
+        public string api_id { get; set; }
     }
 
     public class OutgoingCarrierList
@@ -402,6 +449,8 @@ namespace Plivo.API
         public int priority { get; set; }
         public string outgoing_carrier { get; set; }
         public string resource_uri { get; set; }
+        public string error { get; set; }
+        public string api_id { get; set; }
     }
 
     public class OutgoingCarrierRoutingList
@@ -511,5 +560,6 @@ namespace Plivo.API
         public VoiceRates voice { get; set; }
         public SmsRates message { get; set; }
         public string api_id { get; set; }
+        public string error { get; set; }
     }
 }
