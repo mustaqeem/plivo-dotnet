@@ -57,7 +57,6 @@ PM> Install-Package Plivo
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using RestSharp;
 using Plivo.API;
 
 namespace SampleApplication
@@ -76,7 +75,7 @@ namespace SampleApplication
             string from_number = "XXXXXXXXXXX";
             string to_number = "YYYYYYYYYYY";
 
-            IRestResponse<Call> response = plivo.make_call(new Dictionary<string, string>() {
+            Call response = plivo.make_call(new Dictionary<string, string>() {
                 { "from", from_number },
                 { "to", to_number }, 
                 { "answer_url", "http://some.domain.com/answer/" }, 
@@ -86,17 +85,9 @@ namespace SampleApplication
             // The "Outbound call" API response has four properties -
             // message, request_uuid, error, and api_id.
             // error - contains the error response sent back from the server.
-            if (resp.Data != null)
-            {
-                PropertyInfo[] properties = resp.Data.GetType().GetProperties();
-                foreach (PropertyInfo property in properties)
-                    Console.WriteLine("{0}: {1}", property.Name, property.GetValue(resp.Data, null);
-            }
-            else
-            {
-                // ErrorMessage - contains error related to network failure.
-                Console.WriteLine(resp.ErrorMessage);
-            }
+            PropertyInfo[] properties = response.GetType().GetProperties();
+            foreach (PropertyInfo property in properties)
+                Console.WriteLine("{0}: {1}", property.Name, property.GetValue(response, null);
             Console.Read();
         }
     }
