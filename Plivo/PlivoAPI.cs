@@ -40,7 +40,7 @@ namespace Plivo.API
 
             // add the parameters to the request
             foreach (KeyValuePair<string, string> kvp in data)
-				request.AddParameter(kvp.Key, HtmlEntity.Convert(kvp.Value));
+                request.AddParameter(kvp.Key, HtmlEntity.Convert(kvp.Value));
 
             //set the HTTP method for this request
             switch (http_method.ToUpper())
@@ -78,186 +78,487 @@ namespace Plivo.API
         }
 
         // Accounts //
-        public IRestResponse<Account> get_account()
+        public Account get_account()
         {
-            return null;
-            // had to add an additional space after / as RestSharp consumes it.
+            IRestResponse<Account> account_response = _request<Account>("GET", "/", new dict());
+            Account account = new Account ();
+            if (account_response.Data != null) {
+                account.auth_id = account_response.Data.auth_id;
+                account.auto_recharge = account_response.Data.auto_recharge;
+                account.api_id = account_response.Data.api_id;
+                account.billing_mode = account_response.Data.billing_mode;
+                account.auth_id = account_response.Data.auth_id;
+                account.cash_credits = account_response.Data.cash_credits;
+                account.city = account_response.Data.city;
+                account.state = account_response.Data.state;
+                account.timezone = account_response.Data.timezone;
+                account.resource_uri = account_response.Data.resource_uri;
+            } else {
+                account.error = account_response.ErrorMessage;
+            }
+            return account;
         }
 
-        public IRestResponse<GenericResponse> modify_account(dict parameters)
+        public GenericResponse modify_account(dict parameters)
         {
-            // had to add an additional space after / as RestSharp consumes it.
-            return _request<GenericResponse>("POST", "/ ", parameters);
+            IRestResponse<GenericResponse> generic_response = _request<GenericResponse>("POST", "/", parameters);
+            GenericResponse response = new GenericResponse ();
+            if (generic_response.Data != null) {
+                response.api_id = generic_response.Data.api_id;
+                response.message = generic_response.Data.message;
+                response.error = generic_response.Data.error;
+            } else {
+                response.error = generic_response.ErrorMessage;
+            }
+
+            return response;
         }
 
-        public IRestResponse<SubAccountList> get_subaccounts()
+        public SubAccountList get_subaccounts()
         {
-            return _request<SubAccountList>("GET", "/Subaccount/", new dict());
+            IRestResponse<SubAccountList> response = _request<SubAccountList>("GET", "/Subaccount/", new dict());
+            SubAccountList response_object = new SubAccountList ();
+            if (response != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.meta = response.Data.meta;
+                response_object.objects = response.Data.objects;
+                response_object.error = response.Data.error;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<SubAccount> get_subaccount(dict parameters)
+        public SubAccount get_subaccount(dict parameters)
         {
             string subauth_id = get_key_value(ref parameters, "subauth_id");
-            return _request<SubAccount>("GET", String.Format("/Subaccount/{0}/", subauth_id), parameters);
+            IRestResponse<SubAccount> response = _request<SubAccount>("GET", String.Format("/Subaccount/{0}/", subauth_id), parameters);
+            SubAccount response_object = new SubAccount ();
+            if (response.Data != null) {
+                response_object.account = response.Data.account;
+                response_object.api_id = response.Data.api_id;
+                response_object.auth_token = response.Data.auth_token;
+                response_object.created = response.Data.created;
+                response_object.modified = response.Data.modified;
+                response_object.name = response.Data.name;
+                response_object.resource_uri = response.Data.resource_uri;
+                response_object.error = response.Data.error;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<GenericResponse> create_subaccount(dict parameters)
+        public CreateSubAccount create_subaccount(dict parameters)
         {
-            return _request<GenericResponse>("POST", "/Subaccount/", parameters);
+            IRestResponse<CreateSubAccount> response = _request<CreateSubAccount>("POST", "/Subaccount/", parameters);
+            CreateSubAccount response_object = new CreateSubAccount ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.api_id;
+                response_object.message = response.Data.api_id;
+                response_object.auth_id = response.Data.auth_id;
+                response_object.auth_token = response.Data.auth_token;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<GenericResponse> modify_subaccount(dict parameters)
+        public GenericResponse modify_subaccount(dict parameters)
         {
             string subauth_id = get_key_value(ref parameters, "subauth_id");
-            return _request<GenericResponse>("POST", String.Format("/Subaccount/{0}/ ", subauth_id), parameters);
+            IRestResponse<GenericResponse> response = _request<GenericResponse>("POST", String.Format("/Subaccount/{0}/", subauth_id), parameters);
+            GenericResponse response_object = new GenericResponse ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.message = response.Data.message;
+                response_object.error = response.Data.error;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<GenericResponse> delete_subaccount(dict parameters)
+        public GenericResponse delete_subaccount(dict parameters)
         {
             string subauth_id = get_key_value(ref parameters, "subauth_id");
-            return _request<GenericResponse>("DELETE", String.Format("/Subaccount/{0}/", subauth_id), parameters);
+            IRestResponse<GenericResponse> response = _request<GenericResponse>("DELETE", String.Format("/Subaccount/{0}/", subauth_id), parameters);
+            GenericResponse response_object = new GenericResponse ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.message = response.Data.message;
+                response_object.error = response.Data.error;
+            } else {
+                if (response.ErrorMessage == "Invalid JSON string")
+                    response_object.error = "";
+                else
+                    response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
-
-        /* private static dict mask_if_empty_params(dict parameters)
-         {
-             if (parameters.Count >= 0)
-             {
-                 return parameters;
-             }
-             else{
-                 return new dict();
-             }
-
-         }*/
 
         // Applications //
-        public IRestResponse<ApplicationList> get_applications()
+        public ApplicationList get_applications()
         {
-            return _request<ApplicationList>("GET", "/Application/", new dict());
+            IRestResponse<ApplicationList> response = _request<ApplicationList>("GET", "/Application/", new dict());
+            ApplicationList response_object = new ApplicationList ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.meta = response.Data.meta;
+                response_object.objects = response.Data.objects;
+                response_object.error = response.Data.error;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<ApplicationList> get_applications(dict parameters)
+        public ApplicationList get_applications(dict parameters)
         {
-            return _request<ApplicationList>("GET", "/Application/", parameters);
+            IRestResponse<ApplicationList> response = _request<ApplicationList>("GET", "/Application/", parameters);
+            ApplicationList response_object = new ApplicationList ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.meta = response.Data.meta;
+                response_object.objects = response.Data.objects;
+                response_object.error = response.Data.error;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<Application> get_application(dict parameters)
+        public Application get_application(dict parameters)
         {
             string app_id = get_key_value(ref parameters, "app_id");
-            return _request<Application>("GET", String.Format("/Application/{0}/", app_id), parameters);
+            IRestResponse<Application> response = _request<Application>("GET", String.Format("/Application/{0}/", app_id), parameters);
+            Application response_object = new Application ();
+            if (response.Data != null) {
+                response_object.app_name = response.Data.app_name;
+                response_object.answer_url = response.Data.answer_url;
+                response_object.answer_method = response.Data.answer_method;
+                response_object.app_id = response.Data.app_id;
+                response_object.default_app = response.Data.default_app;
+                response_object.enabled = response.Data.enabled;
+                response_object.fallback_answer_url = response.Data.fallback_answer_url;
+                response_object.fallback_method = response.Data.fallback_method;
+                response_object.hangup_url = response.Data.hangup_url;
+                response_object.hangup_method = response.Data.hangup_method;
+                response_object.message_url = response.Data.message_url;
+                response_object.message_method = response.Data.message_method;
+                response_object.production_app = response.Data.production_app;
+                response_object.public_uri = response.Data.public_uri;
+                response_object.resource_uri = response.Data.resource_uri;
+                response_object.sip_uri = response.Data.sip_uri;
+                response_object.sub_account = response.Data.sub_account;
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<GenericResponse> create_application(dict parameters)
+        public CreateApplication create_application(dict parameters)
         {
-            return _request<GenericResponse>("POST", "/Application/", parameters);
+            IRestResponse<CreateApplication> response = _request<CreateApplication>("POST", "/Application/", parameters);
+            CreateApplication response_object = new CreateApplication ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.message = response.Data.message;
+                response_object.app_id = response.Data.app_id;
+                response_object.error = response.Data.error;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<GenericResponse> modify_application(dict parameters)
+        public GenericResponse modify_application(dict parameters)
         {
             string app_id = get_key_value(ref parameters, "app_id");
-            return _request<GenericResponse>("POST", String.Format("/Application/{0}/", app_id), parameters);
+            IRestResponse<GenericResponse> response = _request<GenericResponse>("POST", String.Format("/Application/{0}/", app_id), parameters);
+            GenericResponse response_object = new GenericResponse ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.message = response.Data.message;
+                response_object.error = response.Data.error;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<GenericResponse> delete_application(dict parameters)
+        public GenericResponse delete_application(dict parameters)
         {
             string app_id = get_key_value(ref parameters, "app_id");
-            return _request<GenericResponse>("DELETE", String.Format("/Application/{0}/", app_id), parameters);
+            IRestResponse<GenericResponse> response = _request<GenericResponse>("DELETE", String.Format("/Application/{0}/", app_id), parameters);
+            GenericResponse response_object = new GenericResponse ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.message = response.Data.message;
+                response_object.error = response.Data.error;
+            } else {
+                if (response.ErrorMessage.Equals("Invalid JSON string"))
+                    response_object.error = "";
+                else
+                    response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
-
 
         // Numbers //
-        public IRestResponse<NumberList> get_numbers()
+        public NumberList get_numbers()
         {
-            return _request<NumberList>("GET", "/Number/", new dict());
+            IRestResponse<NumberList> response = _request<NumberList>("GET", "/Number/", new dict());
+            NumberList response_object = new NumberList ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.meta = response.Data.meta;
+                response_object.objects = response.Data.objects;
+                response_object.error = response.Data.error;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
         [Obsolete("Use search_number_group() instead")]
-        public IRestResponse<NumberList> search_numbers(dict parameters)
+        public NumberList search_numbers(dict parameters)
         {
-            return _request<NumberList>("GET", "/AvailableNumber/", parameters);
+            IRestResponse<NumberList> response = _request<NumberList>("GET", "/AvailableNumber/", parameters);
+            NumberList response_object = new NumberList ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.meta = response.Data.meta;
+                response_object.objects = response.Data.objects;
+                response_object.error = response.Data.error;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<NumberList> search_number_group(dict parameters)
+        public NumberList search_number_group(dict parameters)
         {
-            return _request<NumberList>("GET", "/AvailableNumberGroup/", parameters);
+            IRestResponse<NumberList> response = _request<NumberList>("GET", "/AvailableNumberGroup/", parameters);
+            NumberList response_object = new NumberList ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.meta = response.Data.meta;
+                response_object.objects = response.Data.objects;
+                response_object.error = response.Data.error;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<Number> get_number(dict parameters)
+        public Number get_number(dict parameters)
         {
             string number = get_key_value(ref parameters, "number");
-            return _request<Number>("GET", String.Format("/Number/{0}/", number), parameters);
+            IRestResponse<Number> response = _request<Number>("GET", String.Format("/Number/{0}/", number), parameters);
+            Number response_object = new Number ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.number = response.Data.number;
+                response_object.carrier = response.Data.carrier;
+                response_object.added_on = response.Data.added_on;
+                response_object.application = response.Data.application;
+                response_object.fax_enabled = response.Data.fax_enabled;
+                response_object.number_type = response.Data.number_type;
+                response_object.region = response.Data.region;
+                response_object.resource_uri = response.Data.resource_uri;
+                response_object.api_id = response.Data.api_id;
+                response_object.sms_enabled = response.Data.sms_enabled;
+                response_object.sms_rate = response.Data.sms_rate;
+                response_object.voice_enabled = response.Data.voice_enabled;
+                response_object.voice_rate = response.Data.voice_rate;
+                response_object.error = response.Data.error;
+                response_object.monthly_rental_rate = response.Data.monthly_rental_rate;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        [Obsolete("Use rent_from_number_group() instead")]
-        public IRestResponse<GenericResponse> rent_number(dict parameters)
-        {
-            string number = get_key_value(ref parameters, "number");
-            return _request<GenericResponse>("POST", String.Format("/AvailableNumber/{0}/", number), parameters);
-        }
-
-        public IRestResponse<NumberResponse> rent_from_number_group(dict parameters)
+        public NumberResponse rent_from_number_group(dict parameters)
         {
             string group_id = get_key_value(ref parameters, "group_id");
-            return _request<NumberResponse>("POST", String.Format("/AvailableNumberGroup/{0}/", group_id), parameters);
+            IRestResponse<NumberResponse> response = _request<NumberResponse>("POST", String.Format("/AvailableNumberGroup/{0}/", group_id), parameters);
+            NumberResponse response_object = new NumberResponse ();
+            if (response.Data != null) {
+                response_object.status = response.Data.status;
+                response_object.numbers = response.Data.numbers;
+                response_object.message = response.Data.message;
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<GenericResponse> unrent_number(dict parameters)
+        public GenericResponse unrent_number(dict parameters)
         {
             string number = get_key_value(ref parameters, "number");
-            return _request<GenericResponse>("DELETE", String.Format("/Number/{0}/", number), parameters);
+            IRestResponse<GenericResponse> response = _request<GenericResponse>("DELETE", String.Format("/Number/{0}/", number), parameters);
+            GenericResponse response_object = new GenericResponse ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.message = response.Data.message;
+                response_object.error = response.Data.error;
+            } else {
+                if (response.ErrorMessage.Equals("Invalid JSON string"))
+                    response_object.error = "";
+                else
+                    response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<GenericResponse> link_application_number(dict parameters)
+        public GenericResponse link_application_number(dict parameters)
         {
             string number = get_key_value(ref parameters, "number");
-            return _request<GenericResponse>("POST", String.Format("/Number/{0}/", number), parameters);
+            IRestResponse<GenericResponse> response = _request<GenericResponse>("POST", String.Format("/Number/{0}/", number), parameters);
+            GenericResponse response_object = new GenericResponse ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.message = response.Data.message;
+                response_object.error = response.Data.error;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<GenericResponse> unlink_application_number(dict parameters)
+        public GenericResponse unlink_application_number(dict parameters)
         {
             string number = get_key_value(ref parameters, "number");
             parameters.Add("app_id", "");
-            return _request<GenericResponse>("POST", String.Format("/Number/{0}/", number), parameters);
+            IRestResponse<GenericResponse> response = _request<GenericResponse>("POST", String.Format("/Number/{0}/", number), parameters);
+            GenericResponse response_object = new GenericResponse ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.message = response.Data.message;
+                response_object.error = response.Data.error;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
 
         // Calls //
-        public IRestResponse<CDRList> get_cdrs()
+        public CDRList get_cdrs()
         {
-            return _request<CDRList>("GET", "/Call/", new dict());
+            IRestResponse<CDRList> response = _request<CDRList>("GET", "/Call/", new dict());
+            CDRList response_object = new CDRList ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.meta = response.Data.meta;
+                response_object.objects = response.Data.objects;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<CDRList> get_cdrs(dict parameters)
+        public CDRList get_cdrs(dict parameters)
         {
-            return _request<CDRList>("GET", "/Call/", parameters);
+            IRestResponse<CDRList> response = _request<CDRList>("GET", "/Call/", parameters);
+            CDRList response_object = new CDRList ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.meta = response.Data.meta;
+                response_object.objects = response.Data.objects;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<CDR> get_cdr(dict parameters)
+        public CDR get_cdr(dict parameters)
         {
             string record_id = get_key_value(ref parameters, "record_id");
-            return _request<CDR>("GET", String.Format("/Call/{0}/", record_id), parameters);
+            IRestResponse<CDR> response = _request<CDR>("GET", String.Format("/Call/{0}/", record_id), parameters);
+            CDR response_object = new CDR ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.bill_duration = response.Data.bill_duration;
+                response_object.billed_duration = response.Data.billed_duration;
+                response_object.call_duration = response.Data.call_duration;
+                response_object.call_duration = response.Data.call_duration;
+                response_object.call_uuid = response.Data.call_uuid;
+                response_object.parent_call_uuid = response.Data.parent_call_uuid;
+                response_object.end_time = response.Data.end_time;
+                response_object.error = response.Data.error;
+                response_object.from_number = response.Data.from_number;
+                response_object.to_number = response.Data.to_number;
+                response_object.total_rate = response.Data.total_rate;
+                response_object.total_amount = response.Data.total_amount;
+            } else {
+                response_object.error = response.Data.error;
+            }
+            return response_object;
         }
 
-        public IRestResponse<LiveCallList> get_live_calls()
+        public LiveCallList get_live_calls()
         {
             dict parameters = new dict();
             parameters.Add("status", "live");
-            return _request<LiveCallList>("GET", "/Call/", parameters);
+            IRestResponse<LiveCallList> response = _request<LiveCallList>("GET", "/Call/", parameters);
+            LiveCallList response_object = new LiveCallList ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.calls = response.Data.calls;
+                response_object.error = response.Data.error;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<LiveCall> get_live_call(dict parameters)
+        public LiveCall get_live_call(dict parameters)
         {
             string call_uuid = get_key_value(ref parameters, "call_uuid");
             parameters.Add("status", "live");
-            return _request<LiveCall>("GET", String.Format("/Call/{0}/", call_uuid), parameters);
+            IRestResponse<LiveCall> response = _request<LiveCall>("GET", String.Format("/Call/{0}/", call_uuid), parameters);
+            LiveCall response_object = new LiveCall ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.caller_name = response.Data.caller_name;
+                response_object.call_status = response.Data.call_status;
+                response_object.call_uuid = response.Data.call_uuid;
+                response_object.from = response.Data.from;
+                response_object.to = response.Data.to;
+                response_object.session_start = response.Data.session_start;
+                response_object.direction = response.Data.direction;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<Call> make_call(dict parameters)
+        public Call make_call(dict parameters)
         {
-            return _request<Call>("POST", "/Call/", parameters);
+            IRestResponse<Call> response = _request<Call>("POST", "/Call/", parameters);
+            Call response_object = new Call ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.message = response.Data.message;
+                response_object.request_uuid = response.Data.request_uuid;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
         }
 
-        public IRestResponse<Call> make_bulk_call(dict parameters, dict destNumberSipHeaders)
+        public BulkCall make_bulk_call(dict parameters, dict destNumberSipHeaders)
         {
             string destNumbers = "";
             string headerSIP = "";
@@ -268,311 +569,863 @@ namespace Plivo.API
             }
             parameters.Add("to", destNumbers.Substring(0, destNumbers.Length - 1));
             parameters.Add("sip_headers", headerSIP.Substring(0, headerSIP.Length - 1));
-            return _request<Call>("POST", "/Call/", parameters);
+            IRestResponse<BulkCall> response = _request<BulkCall>("POST", "/Call/", parameters);
+            BulkCall response_object = new BulkCall ();
+            if (response.Data != null) {
+                response_object.error = response.Data.error;
+                response_object.api_id = response.Data.api_id;
+                response_object.message = response.Data.message;
+                response_object.request_uuids = response.Data.request_uuids;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<GenericResponse> hangup_all_calls()
+        public GenericResponse hangup_all_calls()
         {
-            return _request<GenericResponse>("DELETE", "/Call/", new dict());
+            IRestResponse<GenericResponse> response = _request<GenericResponse>("DELETE", "/Call/", new dict());
+            GenericResponse response_object = new GenericResponse ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.message = response.Data.message;
+            } else {
+                if (response.ErrorMessage.Equals("Invalid JSON string"))
+                    response_object.error = "";
+                else
+                    response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<GenericResponse> hangup_call(dict parameters)
-        {
-            string call_uuid = get_key_value(ref parameters, "call_uuid");
-            return _request<GenericResponse>("DELETE", String.Format("/Call/{0}/", call_uuid), parameters);
-        }
-
-        public IRestResponse<GenericResponse> transfer_call(dict parameters)
-        {
-            string call_uuid = get_key_value(ref parameters, "call_uuid");
-            return _request<GenericResponse>("POST", String.Format("/Call/{0}/", call_uuid), parameters);
-        }
-
-        public IRestResponse<Record> record(dict parameters)
-        {
-            string call_uuid = get_key_value(ref parameters, "call_uuid");
-            return _request<Record>("POST", String.Format("/Call/{0}/Record/", call_uuid), parameters);
-        }
-
-        public IRestResponse<GenericResponse> stop_record(dict parameters)
-        {
-            string call_uuid = get_key_value(ref parameters, "call_uuid");
-            return _request<GenericResponse>("DELETE", String.Format("/Call/{0}/Record/", call_uuid), parameters);
-        }
-
-        public IRestResponse<GenericResponse> play(dict parameters)
+        public GenericResponse hangup_call(dict parameters)
         {
             string call_uuid = get_key_value(ref parameters, "call_uuid");
-            return _request<GenericResponse>("POST", String.Format("/Call/{0}/Play/", call_uuid), parameters);
+            IRestResponse<GenericResponse> response = _request<GenericResponse>("DELETE", String.Format("/Call/{0}/", call_uuid), parameters);
+            GenericResponse response_object = new GenericResponse ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.message = response.Data.message;
+            } else {
+                if (response.ErrorMessage.Equals("Invalid JSON string"))
+                    response_object.error = "";
+                else
+                    response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<GenericResponse> stop_play(dict parameters)
+        public GenericResponse transfer_call(dict parameters)
         {
             string call_uuid = get_key_value(ref parameters, "call_uuid");
-            return _request<GenericResponse>("DELETE", String.Format("/Call/{0}/Play/", call_uuid), parameters);
+            IRestResponse<GenericResponse> response = _request<GenericResponse>("POST", String.Format("/Call/{0}/", call_uuid), parameters);
+            GenericResponse response_object = new GenericResponse ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.message = response.Data.message;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<GenericResponse> speak(dict parameters)
+        public Record record(dict parameters)
         {
             string call_uuid = get_key_value(ref parameters, "call_uuid");
-            return _request<GenericResponse>("POST", String.Format("/Call/{0}/Speak/", call_uuid), parameters);
+            IRestResponse<Record> response = _request<Record>("POST", String.Format("/Call/{0}/Record/", call_uuid), parameters);
+            Record response_object = new Record ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.url = response.Data.url;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<GenericResponse> send_digits(dict parameters)
+        public GenericResponse stop_record(dict parameters)
         {
             string call_uuid = get_key_value(ref parameters, "call_uuid");
-            return _request<GenericResponse>("POST", String.Format("/Call/{0}/DTMF/", call_uuid), parameters);
+            IRestResponse<GenericResponse> response = _request<GenericResponse>("DELETE", String.Format("/Call/{0}/Record/", call_uuid), parameters);
+            GenericResponse response_object = new GenericResponse ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.message = response.Data.message;
+            } else {
+                if (response.ErrorMessage.Equals("Invalid JSON string"))
+                    response_object.error = "";
+                else
+                    response_object.error = response.ErrorMessage;
+            }
+            return response_object;
+        }
+
+        public GenericResponse play(dict parameters)
+        {
+            string call_uuid = get_key_value(ref parameters, "call_uuid");
+            IRestResponse<GenericResponse> response = _request<GenericResponse>("POST", String.Format("/Call/{0}/Play/", call_uuid), parameters);
+            GenericResponse response_object = new GenericResponse ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.message = response.Data.message;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
+        }
+
+        public GenericResponse stop_play(dict parameters)
+        {
+            string call_uuid = get_key_value(ref parameters, "call_uuid");
+            IRestResponse<GenericResponse> response = _request<GenericResponse>("DELETE", String.Format("/Call/{0}/Play/", call_uuid), parameters);
+            GenericResponse response_object = new GenericResponse ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.message = response.Data.message;
+            } else {
+                if (response.ErrorMessage.Equals("Invalid JSON string"))
+                    response_object.error = "";
+                else
+                    response_object.error = response.ErrorMessage;
+            }
+            return response_object;
+        }
+
+        public GenericResponse speak(dict parameters)
+        {
+            string call_uuid = get_key_value(ref parameters, "call_uuid");
+            IRestResponse<GenericResponse> response = _request<GenericResponse>("POST", String.Format("/Call/{0}/Speak/", call_uuid), parameters);
+            GenericResponse response_object = new GenericResponse ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.message = response.Data.message;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
+        }
+
+        public GenericResponse send_digits(dict parameters)
+        {
+            string call_uuid = get_key_value(ref parameters, "call_uuid");
+            IRestResponse<GenericResponse> response = _request<GenericResponse>("POST", String.Format("/Call/{0}/DTMF/", call_uuid), parameters);
+            GenericResponse response_object = new GenericResponse ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.message = response.Data.message;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
 
         // Conferences //
-        public IRestResponse<LiveConferenceList> get_live_conferences()
+        public LiveConferenceList get_live_conferences()
         {
-            return _request<LiveConferenceList>("GET", "/Conference/", new dict());
+            IRestResponse<LiveConferenceList> response = _request<LiveConferenceList>("GET", "/Conference/", new dict());
+            LiveConferenceList response_object = new LiveConferenceList ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.conferences = response.Data.conferences;
+                response_object.error = response.Data.error;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<GenericResponse> hangup_all_conferences()
+        public GenericResponse hangup_all_conferences()
         {
-            return _request<GenericResponse>("DELETE", "/Conference/", new dict());
+            IRestResponse<GenericResponse> response = _request<GenericResponse>("DELETE", "/Conference/", new dict());
+            GenericResponse response_object = new GenericResponse ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.message = response.Data.message;
+            } else {
+                if (response.ErrorMessage.Equals("Invalid JSON string"))
+                    response_object.error = "";
+                else
+                    response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<Conference> get_live_conference(dict parameters)
-        {
-            string conference_name = get_key_value(ref parameters, "conference_name");
-            return _request<Conference>("GET", String.Format("/Conference/{0}/", conference_name), parameters);
-        }
-
-        public IRestResponse<GenericResponse> hangup_conference(dict parameters)
-        {
-            string conference_name = get_key_value(ref parameters, "conference_name");
-            return _request<GenericResponse>("DELETE", String.Format("/Conference/{0}/", conference_name), parameters);
-        }
-
-        public IRestResponse<GenericResponse> hangup_member(dict parameters)
-        {
-            string conference_name = get_key_value(ref parameters, "conference_name");
-            string member_id = get_key_value(ref parameters, "member_id");
-            return _request<GenericResponse>("DELETE", String.Format("/Conference/{0}/Member/{1}/", conference_name, member_id), parameters);
-        }
-
-        public IRestResponse<GenericResponse> play_member(dict parameters)
-        {
-            string conference_name = get_key_value(ref parameters, "conference_name");
-            string member_id = get_key_value(ref parameters, "member_id");
-            return _request<GenericResponse>("POST", String.Format("/Conference/{0}/Member/{1}/Play/", conference_name, member_id), parameters);
-        }
-
-        public IRestResponse<GenericResponse> stop_play_member(dict parameters)
+        public Conference get_live_conference(dict parameters)
         {
             string conference_name = get_key_value(ref parameters, "conference_name");
-            string member_id = get_key_value(ref parameters, "member_id");
-            return _request<GenericResponse>("DELETE", String.Format("/Conference/{0}/Member/{1}/Play/", conference_name, member_id), parameters);
+            IRestResponse<Conference> response = _request<Conference>("GET", String.Format("/Conference/{0}/", conference_name), parameters);
+            Conference response_object = new Conference ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.conference_name = response.Data.conference_name;
+                response_object.conference_member_count = response.Data.conference_member_count;
+                response_object.conference_run_time = response.Data.conference_run_time;
+                response_object.error = response.Data.error;
+                response_object.members = response.Data.members;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<GenericResponse> speak_member(dict parameters)
+        public GenericResponse hangup_conference(dict parameters)
         {
             string conference_name = get_key_value(ref parameters, "conference_name");
-            string member_id = get_key_value(ref parameters, "member_id");
-            return _request<GenericResponse>("POST", String.Format("/Conference/{0}/Member/{1}/Speak/", conference_name, member_id), parameters);
+            IRestResponse<GenericResponse> response = _request<GenericResponse>("DELETE", String.Format("/Conference/{0}/", conference_name), parameters);
+            GenericResponse response_object = new GenericResponse ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.message = response.Data.message;
+            } else {
+                if (response.ErrorMessage.Equals("Invalid JSON string"))
+                    response_object.error = "";
+                else
+                    response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<GenericResponse> deaf_member(dict parameters)
-        {
-            string conference_name = get_key_value(ref parameters, "conference_name");
-            string member_id = get_key_value(ref parameters, "member_id");
-            return _request<GenericResponse>("POST", String.Format("/Conference/{0}/Member/{1}/Deaf/", conference_name, member_id), parameters);
-        }
-
-        public IRestResponse<GenericResponse> undeaf_member(dict parameters)
-        {
-            string conference_name = get_key_value(ref parameters, "conference_name");
-            string member_id = get_key_value(ref parameters, "member_id");
-            return _request<GenericResponse>("DELETE", String.Format("/Conference/{0}/Member/{1}/Deaf/", conference_name, member_id), parameters);
-        }
-
-        public IRestResponse<GenericResponse> mute_member(dict parameters)
-        {
-            string conference_name = get_key_value(ref parameters, "conference_name");
-            string member_id = get_key_value(ref parameters, "member_id");
-            return _request<GenericResponse>("POST", String.Format("/Conference/{0}/Member/{1}/Mute/", conference_name, member_id), parameters);
-        }
-
-        public IRestResponse<GenericResponse> unmute_member(dict parameters)
+        public GenericResponse hangup_member(dict parameters)
         {
             string conference_name = get_key_value(ref parameters, "conference_name");
             string member_id = get_key_value(ref parameters, "member_id");
-            return _request<GenericResponse>("DELETE", String.Format("/Conference/{0}/Member/{1}/Mute/", conference_name, member_id), parameters);
+            IRestResponse<GenericResponse> response = _request<GenericResponse>("DELETE", String.Format("/Conference/{0}/Member/{1}/", conference_name, member_id), parameters);
+            GenericResponse response_object = new GenericResponse ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.message = response.Data.message;
+            } else {
+                if (response.ErrorMessage.Equals("Invalid JSON string"))
+                    response_object.error = "";
+                else
+                    response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<GenericResponse> kick_member(dict parameters)
+        public GenericResponse play_member(dict parameters)
         {
             string conference_name = get_key_value(ref parameters, "conference_name");
             string member_id = get_key_value(ref parameters, "member_id");
-            return _request<GenericResponse>("POST", String.Format("/Conference/{0}/Member/{1}/Kick/", conference_name, member_id), parameters);
+            IRestResponse<GenericResponse> response = _request<GenericResponse>("POST", String.Format("/Conference/{0}/Member/{1}/Play/", conference_name, member_id), parameters);
+            GenericResponse response_object = new GenericResponse ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.message = response.Data.message;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<Record> record_conference(dict parameters)
+        public GenericResponse stop_play_member(dict parameters)
         {
             string conference_name = get_key_value(ref parameters, "conference_name");
-            return _request<Record>("POST", String.Format("/Conference/{0}/Record/", conference_name), parameters);
+            string member_id = get_key_value(ref parameters, "member_id");
+            IRestResponse<GenericResponse> response = _request<GenericResponse>("DELETE", String.Format("/Conference/{0}/Member/{1}/Play/", conference_name, member_id), parameters);
+            GenericResponse response_object = new GenericResponse ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.message = response.Data.message;
+            } else {
+                if (response.ErrorMessage.Equals("Invalid JSON string"))
+                    response_object.error = "";
+                else
+                    response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<GenericResponse> stop_record_conference(dict parameters)
+        public GenericResponse speak_member(dict parameters)
         {
             string conference_name = get_key_value(ref parameters, "conference_name");
-            return _request<GenericResponse>("DELETE", String.Format("/Conference/{0}/Record/", conference_name), parameters);
+            string member_id = get_key_value(ref parameters, "member_id");
+            IRestResponse<GenericResponse> response = _request<GenericResponse>("POST", String.Format("/Conference/{0}/Member/{1}/Speak/", conference_name, member_id), parameters);
+            GenericResponse response_object = new GenericResponse ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.message = response.Data.message;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
+        }
+
+        public GenericResponse deaf_member(dict parameters)
+        {
+            string conference_name = get_key_value(ref parameters, "conference_name");
+            string member_id = get_key_value(ref parameters, "member_id");
+            IRestResponse<GenericResponse> response = _request<GenericResponse>("POST", String.Format("/Conference/{0}/Member/{1}/Deaf/", conference_name, member_id), parameters);
+            GenericResponse response_object = new GenericResponse ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.message = response.Data.message;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
+        }
+
+        public GenericResponse undeaf_member(dict parameters)
+        {
+            string conference_name = get_key_value(ref parameters, "conference_name");
+            string member_id = get_key_value(ref parameters, "member_id");
+            IRestResponse<GenericResponse> response = _request<GenericResponse>("DELETE", String.Format("/Conference/{0}/Member/{1}/Deaf/", conference_name, member_id), parameters);
+            GenericResponse response_object = new GenericResponse ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.message = response.Data.message;
+            } else {
+                if (response.ErrorMessage.Equals("Invalid JSON string"))
+                    response_object.error = "";
+                else
+                    response_object.error = response.ErrorMessage;
+            }
+            return response_object;
+        }
+
+        public GenericResponse mute_member(dict parameters)
+        {
+            string conference_name = get_key_value(ref parameters, "conference_name");
+            string member_id = get_key_value(ref parameters, "member_id");
+            IRestResponse<GenericResponse> response = _request<GenericResponse>("POST", String.Format("/Conference/{0}/Member/{1}/Mute/", conference_name, member_id), parameters);
+            GenericResponse response_object = new GenericResponse ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.message = response.Data.message;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
+        }
+
+        public GenericResponse unmute_member(dict parameters)
+        {
+            string conference_name = get_key_value(ref parameters, "conference_name");
+            string member_id = get_key_value(ref parameters, "member_id");
+            IRestResponse<GenericResponse> response = _request<GenericResponse>("DELETE", String.Format("/Conference/{0}/Member/{1}/Mute/", conference_name, member_id), parameters);
+            GenericResponse response_object = new GenericResponse ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.message = response.Data.message;
+            } else {
+                if (response.ErrorMessage.Equals("Invalid JSON string"))
+                    response_object.error = "";
+                else
+                    response_object.error = response.ErrorMessage;
+            }
+            return response_object;
+        }
+
+        public GenericResponse kick_member(dict parameters)
+        {
+            string conference_name = get_key_value(ref parameters, "conference_name");
+            string member_id = get_key_value(ref parameters, "member_id");
+            IRestResponse<GenericResponse> response = _request<GenericResponse>("POST", String.Format("/Conference/{0}/Member/{1}/Kick/", conference_name, member_id), parameters);
+            GenericResponse response_object = new GenericResponse ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.message = response.Data.message;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
+        }
+
+        public Record record_conference(dict parameters)
+        {
+            string conference_name = get_key_value(ref parameters, "conference_name");
+            IRestResponse<Record> response = _request<Record>("POST", String.Format("/Conference/{0}/Record/", conference_name), parameters);
+            Record response_object = new Record ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.message = response.Data.message;
+                response_object.url = response.Data.url;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
+        }
+
+        public GenericResponse stop_record_conference(dict parameters)
+        {
+            string conference_name = get_key_value(ref parameters, "conference_name");
+            IRestResponse<GenericResponse> response = _request<GenericResponse>("DELETE", String.Format("/Conference/{0}/Record/", conference_name), parameters);
+            GenericResponse response_object = new GenericResponse ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.message = response.Data.message;
+            } else {
+                if (response.ErrorMessage.Equals("Invalid JSON string"))
+                    response_object.error = "";
+                else
+                    response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
 
         // Endpoints //
-        public IRestResponse<EndpointList> get_endpoints()
+        public EndpointList get_endpoints()
         {
-            return _request<EndpointList>("GET", "/Endpoint/", new dict());
+            IRestResponse<EndpointList> response = _request<EndpointList>("GET", "/Endpoint/", new dict());
+            EndpointList response_object = new EndpointList ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.meta = response.Data.meta;
+                response_object.objects = response.Data.objects;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<EndpointList> get_endpoints(dict parameters)
+        public EndpointList get_endpoints(dict parameters)
         {
-            return _request<EndpointList>("GET", "/Endpoint/", parameters);
+            IRestResponse<EndpointList> response = _request<EndpointList>("GET", "/Endpoint/", parameters);
+            EndpointList response_object = new EndpointList ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.meta = response.Data.meta;
+                response_object.objects = response.Data.objects;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<Endpoint> create_endpoint(dict parameters)
+        public CreateEndpoint create_endpoint(dict parameters)
         {
-            return _request<Endpoint>("POST", "/Endpoint/", parameters);
+            IRestResponse<CreateEndpoint> response = _request<Endpoint>("POST", "/Endpoint/", parameters);
+            CreateEndpoint response_object = new CreateEndpoint ();
+            if (response.Data != null) {
+                response_object.alias = response.Data.alias;
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.message = response.Data.message;
+                response_object.username = response.Data.username;
+                response_object.endpoint_id = response.Data.endpoint_id;
+            } else {
+                response_object.error = response.Data.error;
+            }
+            return response_object;
         }
 
-        public IRestResponse<Endpoint> get_endpoint(dict parameters)
+        public Endpoint get_endpoint(dict parameters)
         {
             string endpoint_id = get_key_value(ref parameters, "endpoint_id");
-            return _request<Endpoint>("GET", String.Format("/Endpoint/{0}/", endpoint_id), parameters);
+            IRestResponse<Endpoint> response = _request<Endpoint>("GET", String.Format("/Endpoint/{0}/", endpoint_id), parameters);
+            Endpoint response_object = new Endpoint ();
+            if (response.Data != null) {
+                response_object.alias = response.Data.alias;
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.username = response.Data.username;
+                response_object.endpoint_id = response.Data.endpoint_id;
+                response_object.password = response.Data.password;
+                response_object.resource_uri = response.Data.resource_uri;
+                response_object.sip_uri = response.Data.sip_uri;
+            } else {
+                response_object.error = response.Data.error;
+            }
+            return response_object;
         }
 
-        public IRestResponse<GenericResponse> modify_endpoint(dict parameters)
+        public GenericResponse modify_endpoint(dict parameters)
         {
             string endpoint_id = get_key_value(ref parameters, "endpoint_id");
-            return _request<GenericResponse>("POST", String.Format("/Endpoint/{0}/", endpoint_id), parameters);
+            IRestResponse<GenericResponse> response = _request<GenericResponse>("POST", String.Format("/Endpoint/{0}/", endpoint_id), parameters);
+            GenericResponse response_object = new GenericResponse ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.message = response.Data.message;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<GenericResponse> delete_endpoint(dict parameters)
+        public GenericResponse delete_endpoint(dict parameters)
         {
             string endpoint_id = get_key_value(ref parameters, "endpoint_id");
-            return _request<GenericResponse>("DELETE", String.Format("/Endpoint/{0}/", endpoint_id), parameters);
+            IRestResponse<GenericResponse> response = _request<GenericResponse>("DELETE", String.Format("/Endpoint/{0}/", endpoint_id), parameters);
+            GenericResponse response_object = new GenericResponse ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.message = response.Data.message;
+            } else {
+                if (response.ErrorMessage.Equals("Invalid JSON string"))
+                    response_object.error = "";
+                else
+                    response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
 
         // Messages //
-        public IRestResponse<MessageResponse> send_message(dict parameters)
+        public MessageResponse send_message(dict parameters)
         {
-            return _request<MessageResponse>("POST", "/Message/", parameters);
+            IRestResponse<MessageResponse> response = _request<MessageResponse>("POST", "/Message/", parameters);
+            MessageResponse response_object = new MessageResponse ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.message = response.Data.message;
+                response_object.message_uuid = response.Data.message_uuid;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<Message> get_message(dict parameters)
+        public Message get_message(dict parameters)
         {
             string record_id = get_key_value(ref parameters, "record_id");
-            return _request<Message>("GET", String.Format("/Message/{0}/", record_id), parameters);
+            IRestResponse<Message> response = _request<Message>("GET", String.Format("/Message/{0}/", record_id), parameters);
+            Message response_object = new Message ();
+            if (response.Data != null) {
+                response_object.total_amount = response.Data.total_amount;
+                response_object.total_rate = response.Data.total_rate;
+                response_object.to_number = response.Data.to_number;
+                response_object.from_number = response.Data.from_number;
+                response_object.message_direction = response.Data.message_direction;
+                response_object.message_state = response.Data.message_state;
+                response_object.message_time = response.Data.message_time;
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
 
-        public IRestResponse<MessageList> get_messages()
+        public MessageList get_messages()
         {
-            return _request<MessageList>("GET", "/Message/", new dict());
+            IRestResponse<MessageList> response = _request<MessageList>("GET", "/Message/", new dict());
+            MessageList response_object = new MessageList ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.meta = response.Data.meta;
+                response_object.objects = response.Data.objects;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<MessageList> get_messages(dict parameters)
+        public MessageList get_messages(dict parameters)
         {
-            return _request<MessageList>("GET", "/Message/", parameters);
+            IRestResponse<MessageList> response = _request<MessageList>("GET", "/Message/", parameters);
+            MessageList response_object = new MessageList ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.meta = response.Data.meta;
+                response_object.objects = response.Data.objects;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
 
         // Inbound Carriers
-        public IRestResponse<IncomingCarrierList> get_incoming_carriers(dict parameters)
+        public IncomingCarrierList get_incoming_carriers(dict parameters)
         {
-            return _request<IncomingCarrierList>("GET", "/IncomingCarrier/", parameters);
+            IRestResponse<IncomingCarrierList> response = _request<IncomingCarrierList>("GET", "/IncomingCarrier/", parameters);
+            IncomingCarrierList response_object = new IncomingCarrierList ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.meta = response.Data.meta;
+                response_object.error = response.Data.error;
+                response_object.objects = response.Data.objects;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<IncomingCarrier> get_incoming_carrier(dict parameters)
+        public IncomingCarrier get_incoming_carrier(dict parameters)
         {
             string carrierId = get_key_value(ref parameters, "carrier_id");
-            return _request<IncomingCarrier>("GET", String.Format("/IncomingCarrier/{0}/", carrierId), parameters);
+            IRestResponse<IncomingCarrier> response = _request<IncomingCarrier>("GET", String.Format("/IncomingCarrier/{0}/", carrierId), parameters);
+            IncomingCarrier response_object = new IncomingCarrier ();
+            if (response.Data != null) {
+                response_object.carrier_id = response.Data.carrier_id;
+                response_object.api_id = response.Data.api_id;
+                response_object.api_id = response.Data.api_id;
+                response_object.ip_set = response.Data.ip_set;
+                response_object.name = response.Data.name;
+                response_object.resource_uri = response.Data.resource_uri;
+                response_object.sms = response.Data.sms;
+                response_object.voice = response.Data.voice;
+                response_object.error = response.Data.error;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
         }
 
-        public IRestResponse<GenericResponse> create_incoming_carrier(dict parameters)
+        public GenericResponse create_incoming_carrier(dict parameters)
         {
-            return _request<GenericResponse>("POST", "/IncomingCarrier/", parameters);
+            IRestResponse<GenericResponse> response = _request<GenericResponse>("POST", "/IncomingCarrier/", parameters);
+            GenericResponse response_object = new GenericResponse ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.message = response.Data.message;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<IncomingCarrier> modify_incoming_carrier(dict parameters)
+        public GenericResponse modify_incoming_carrier(dict parameters)
         {
             string carrierId = get_key_value(ref parameters, "carrier_id");
-            return _request<IncomingCarrier>("POST", String.Format("/IncomingCarrier/{0}/", carrierId), parameters);
+            IRestResponse<GenericResponse> response = _request<IncomingCarrier>("POST", String.Format("/IncomingCarrier/{0}/", carrierId), parameters);
+            GenericResponse response_object = new GenericResponse ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.message = response.Data.message;
+                response_object.error = response.Data.error;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<GenericResponse> delete_incoming_carrier(dict parameters)
+        public GenericResponse delete_incoming_carrier(dict parameters)
         {
             string carrierId = get_key_value(ref parameters, "carrier_id");
-            return _request<GenericResponse>("DELETE", String.Format("/IncomingCarrier/{0}/", carrierId), parameters);
+            IRestResponse<GenericResponse> response = _request<GenericResponse>("DELETE", String.Format("/IncomingCarrier/{0}/", carrierId), parameters);
+            GenericResponse response_object = new GenericResponse ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.message = response.Data.message;
+            } else {
+                if (response.ErrorMessage.Equals("Invalid JSON string"))
+                    response_object.error = "";
+                else
+                    response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<PlivoPricing> pricing(dict parameters)
+        public PlivoPricing pricing(dict parameters)
         {
-            return _request<PlivoPricing>("GET", "/Pricing/", parameters);
+            IRestResponse<PlivoPricing> response = _request<PlivoPricing>("GET", "/Pricing/", parameters);
+            PlivoPricing response_object = new PlivoPricing ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.country = response.Data.country;
+                response_object.country_code = response.Data.country_code;
+                response_object.country_iso = response.Data.country_iso;
+                response_object.phone_numbers = response.Data.phone_numbers;
+                response_object.message = response.Data.message;
+                response_object.voice = response.Data.voice;
+            } else {
+                response_object.error = response.Data.error;
+            }
+            return response_object;
         }
 
         // Outgoing Carriers
-        public IRestResponse<OutgoingCarrierList> get_outgoing_carriers()
+        public OutgoingCarrierList get_outgoing_carriers()
         {
-            return _request<OutgoingCarrierList>("GET", "/OutgoingCarrier/", new dict());
+            IRestResponse<OutgoingCarrierList> response = _request<OutgoingCarrierList>("GET", "/OutgoingCarrier/", new dict());
+            OutgoingCarrierList response_object = new OutgoingCarrierList ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.meta = response.Data.meta;
+                response_object.objects = response.Data.objects;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<OutgoingCarrier> get_outgoing_carrier(dict parameters)
+        public OutgoingCarrier get_outgoing_carrier(dict parameters)
         {
             string carrierId = get_key_value(ref parameters, "carrier_id");
-            return _request<OutgoingCarrier>("GET", String.Format("/OutgoingCarrier/{0}/", carrierId), parameters);
+            IRestResponse<OutgoingCarrier> response = _request<OutgoingCarrier>("GET", String.Format("/OutgoingCarrier/{0}/", carrierId), parameters);
+            OutgoingCarrier response_object = new OutgoingCarrier ();
+            if (response.Data != null) {
+                response_object.address = response.Data.address;
+                response_object.prefix = response.Data.prefix;
+                response_object.failover_address = response.Data.failover_address;
+                response_object.failover_prefix = response.Data.failover_prefix;
+                response_object.enabled = response.Data.enabled;
+                response_object.carrier_id = response.Data.carrier_id;
+                response_object.ips = response.Data.ips;
+                response_object.retries = response.Data.resource_uri;
+                response_object.retries = response.Data.retries;
+                response_object.error = response.Data.error;
+                response_object.api_id = response.Data.api_id;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<GenericResponse> create_outgoing_carrier(dict parameters)
+        public GenericResponse create_outgoing_carrier(dict parameters)
         {
-            return _request<GenericResponse>("POST", "/OutgoingCarrier/", parameters);
+            IRestResponse<GenericResponse> response = _request<GenericResponse>("POST", "/OutgoingCarrier/", parameters);
+            GenericResponse response_object = new GenericResponse ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.message = response.Data.message;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<GenericResponse> modify_outgoing_carrier(dict parameters)
+        public GenericResponse modify_outgoing_carrier(dict parameters)
         {
             string carrierId = get_key_value(ref parameters, "carrier_id");
-            return _request<GenericResponse>("POST", String.Format("/OutgoingCarrier/{0}/", carrierId), parameters);
+            IRestResponse<GenericResponse> response = _request<GenericResponse>("POST", String.Format("/OutgoingCarrier/{0}/", carrierId), parameters);
+            GenericResponse response_object = new GenericResponse ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.message = response.Data.message;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<GenericResponse> delete_outgoing_carrier(dict parameters)
+        public GenericResponse delete_outgoing_carrier(dict parameters)
         {
             string carrierId = get_key_value(ref parameters, "carrier_id");
-            return _request<GenericResponse>("DELETE", String.Format("/OutgoingCarrier/{0}/", carrierId), parameters);
+            IRestResponse<GenericResponse> response = _request<GenericResponse>("DELETE", String.Format("/OutgoingCarrier/{0}/", carrierId), parameters);
+            GenericResponse response_object = new GenericResponse ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.message = response.Data.message;
+            } else {
+                if (response.ErrorMessage.Equals("Invalid JSON string"))
+                    response_object.error = "";
+                else
+                    response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
         // Outgoing Carrier Routings
-        public IRestResponse<OutgoingCarrierRoutingList> get_outgoing_carrier_routings()
+        public OutgoingCarrierRoutingList get_outgoing_carrier_routings()
         {
-            return _request<OutgoingCarrierRoutingList>("GET", "/OutgoingCarrierRouting/", new dict());
+            IRestResponse<OutgoingCarrierRoutingList> response = _request<OutgoingCarrierRoutingList>("GET", "/OutgoingCarrierRouting/", new dict());
+            OutgoingCarrierRoutingList response_object = new OutgoingCarrierRoutingList ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.meta = response.Data.meta;
+                response_object.objects = response.Data.objects;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<OutgoingCarrierRouting> get_outgoing_carrier_routing(dict parameters)
+        public OutgoingCarrierRouting get_outgoing_carrier_routing(dict parameters)
         {
             string carrierId = get_key_value(ref parameters, "routing_id");
-            return _request<OutgoingCarrierRouting>("GET", String.Format("/OutgoingCarrierRouting/{0}/", carrierId), parameters);
+            IRestResponse<OutgoingCarrierRouting> response = _request<OutgoingCarrierRouting>("GET", String.Format("/OutgoingCarrierRouting/{0}/", carrierId), parameters);
+            OutgoingCarrierRouting response_object = new OutgoingCarrierRouting ();
+            if (response.Data != null) {
+                response_object.digits = response.Data.digits;
+                response_object.outgoing_carrier = response.Data.outgoing_carrier;
+                response_object.resource_uri = response.Data.resource_uri;
+                response_object.routing_id = response.Data.routing_id;
+                response_object.priority = response.Data.priority;
+                response_object.error = response.Data.error;
+                response_object.api_id = response.Data.api_id;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<GenericResponse> create_outgoing_carrier_routing(dict parameters)
+        public GenericResponse create_outgoing_carrier_routing(dict parameters)
         {
-            return _request<GenericResponse>("POST", "/OutgoingCarrierRouting/", parameters);
+            IRestResponse<GenericResponse> response = _request<GenericResponse>("POST", "/OutgoingCarrierRouting/", parameters);
+            GenericResponse response_object = new GenericResponse ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.message = response.Data.message;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<GenericResponse> modify_outgoing_carrier_routing(dict parameters)
+        public GenericResponse modify_outgoing_carrier_routing(dict parameters)
         {
             string carrierId = get_key_value(ref parameters, "routing_id");
-            return _request<GenericResponse>("POST", String.Format("/OutgoingCarrierRouting/{0}/", carrierId), parameters);
+            IRestResponse<GenericResponse> response = _request<GenericResponse>("POST", String.Format("/OutgoingCarrierRouting/{0}/", carrierId), parameters);
+            GenericResponse response_object = new GenericResponse ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.message = response.Data.message;
+            } else {
+                response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
 
-        public IRestResponse<GenericResponse> delete_outgoing_carrier_routing(dict parameters)
+        public GenericResponse delete_outgoing_carrier_routing(dict parameters)
         {
             string carrierId = get_key_value(ref parameters, "routing_id");
-            return _request<GenericResponse>("DELETE", String.Format("/OutgoingCarrierRouting/{0}/", carrierId), parameters);
+            IRestResponse<GenericResponse> response = _request<GenericResponse>("DELETE", String.Format("/OutgoingCarrierRouting/{0}/", carrierId), parameters);
+            GenericResponse response_object = new GenericResponse ();
+            if (response.Data != null) {
+                response_object.api_id = response.Data.api_id;
+                response_object.error = response.Data.error;
+                response_object.message = response.Data.message;
+            } else {
+                if (response.ErrorMessage.Equals("Invalid JSON string"))
+                    response_object.error = "";
+                else
+                    response_object.error = response.ErrorMessage;
+            }
+            return response_object;
         }
     }
 }
